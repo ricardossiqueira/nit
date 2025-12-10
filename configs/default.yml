@@ -1,0 +1,40 @@
+github:
+  default_base_branch: "main"
+  use_gh_cli: true
+
+model:
+  provider: "ollama"
+  model_name: "deepseek-coder"
+  endpoint: "http://localhost:11434/v1/chat"
+  max_tokens: 2048
+  temperature: 0.2
+  timeout_seconds: 60
+
+pr_style:
+  language: "pt-BR"
+  title:
+    pattern: "[{type}] {scope}: {summary}"
+    allowed_types: ["feat", "fix", "chore", "refactor", "docs"]
+    max_length: 72
+  description_sections:
+    - name: "Contexto"
+      required: true
+    - name: "Mudanças"
+      required: true
+    - name: "Impacto"
+      required: false
+    - name: "Testes"
+      required: true
+  coverage_checklist:
+    - "Explica o motivo da mudança"
+    - "Lista as principais alterações"
+    - "Menciona módulos afetados"
+    - "Indica impacto ou riscos"
+    - "Descreve como testar"
+
+review:
+  focus: ["bugs", "legibilidade", "estilo"]
+  python_version: "3.11"
+  style_guide: "pep8"
+  max_diff_lines: 800
+
