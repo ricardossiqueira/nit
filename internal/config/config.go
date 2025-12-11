@@ -60,7 +60,7 @@ type Section struct {
 func DefaultConfig() *Config {
 	return &Config{
 		GitHub: GitHubConfig{
-			DefaultBaseBranch: "main",
+			DefaultBaseBranch: "master",
 			UseGHCLI:          true,
 		},
 		Model: ModelConfig{
