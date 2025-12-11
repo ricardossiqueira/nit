@@ -48,7 +48,7 @@ func Execute() {
 
 func init() {
 	cobra.OnInitialize(initConfig)
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is .check.yml, $HOME/.check.yml)")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is .check.yaml, $HOME/.check.yaml)")
 	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "verbose output")
 }
 
@@ -68,7 +68,7 @@ func initConfig() {
 	}
 
 	var cfg config.Config
-	if err := viper.ReadInConfig(); err == nil {
+	if err := viper.Unmarshal(&cfg); err != nil {
 		fmt.Printf("Error unmarshalling config: %v\n", err)
 		os.Exit(1)
 
