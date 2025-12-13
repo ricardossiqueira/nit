@@ -10,51 +10,51 @@ import (
 )
 
 type Config struct {
-	GitHub  GitHubConfig  `yaml:"github"`
-	Model   ModelConfig   `yaml:"model"`
-	PRStyle PRStyleConfig `yaml:"pr_style"`
-	Review  ReviewConfig  `yaml:"review"`
-	Prompt  PromptConfig  `yaml:"prompt"`
+	GitHub  GitHubConfig  `mapstruct:"github"`
+	Model   ModelConfig   `mapstruct:"model"`
+	PRStyle PRStyleConfig `mapstruct:"pr_style"`
+	Review  ReviewConfig  `mapstruct:"review"`
+	Prompt  PromptConfig  `mapstruct:"prompt"`
 }
 
 type GitHubConfig struct {
-	DefaultBaseBranch string `yaml:"default_base_branch"`
-	UseGHCLI          bool   `yaml:"use_gh_cli"`
+	DefaultBaseBranch string `mapstruct:"default_base_branch"`
+	UseGHCLI          bool   `mapstruct:"use_gh_cli"`
 }
 
 type ModelConfig struct {
-	Provider    string  `yaml:"provider"`
-	ModelName   string  `yaml:"model_name"`
-	Endpoint    string  `yaml:"endpoint"`
-	MaxTokens   int     `yaml:"max_tokens"`
-	Temperature float64 `yaml:"temperature"`
-	Timeout     int     `yaml:"timeout_in_seconds"`
+	Provider    string  `mapstruct:"provider"`
+	ModelName   string  `mapstruct:"model_name"`
+	Endpoint    string  `mapstruct:"endpoint"`
+	MaxTokens   int     `mapstruct:"max_tokens"`
+	Temperature float64 `mapstruct:"temperature"`
+	Timeout     int     `mapstruct:"timeout_in_seconds"`
 }
 
 type PRStyleConfig struct {
-	Language           string    `yaml:"language"`
-	TitlePattern       string    `yaml:"title_pattern"`
-	AllowedTypes       []string  `yaml:"allowed_types"`
-	DescriptionSection []Section `yaml:"description_section"`
-	CoverageChecklist  []string  `yaml:"coverage_check_list"`
+	Language           string    `mapstruct:"language"`
+	TitlePattern       string    `mapstruct:"title_pattern"`
+	AllowedTypes       []string  `mapstruct:"allowed_types"`
+	DescriptionSection []Section `mapstruct:"description_section"`
+	CoverageChecklist  []string  `mapstruct:"coverage_check_list"`
 }
 
 type ReviewConfig struct {
-	Focus           []string          `yaml:"focus"`
-	PythonVersion   string            `yaml:"python_version"`
-	StyleGuide      string            `yaml:"style_guide"`
-	MaxDiffLines    int               `yaml:"max_diff_lines"`
-	SeverityMapping map[string]string `yaml:"severity_mapping"`
+	Focus           []string          `mapstruct:"focus"`
+	PythonVersion   string            `mapstruct:"python_version"`
+	StyleGuide      string            `mapstruct:"style_guide"`
+	MaxDiffLines    int               `mapstruct:"max_diff_lines"`
+	SeverityMapping map[string]string `mapstruct:"severity_mapping"`
 }
 
 type PromptConfig struct {
-	SystemInstructions string   `yaml:"system_instructions"`
-	ExtraRules         []string `yaml:"extra_rules"`
+	SystemInstructions string   `mapstruct:"system_instructions"`
+	ExtraRules         []string `mapstruct:"extra_rules"`
 }
 
 type Section struct {
-	Name     string `yaml:"name"`
-	Required bool   `yaml:"required"`
+	Name     string `mapstruct:"name"`
+	Required bool   `mapstruct:"required"`
 }
 
 func DefaultConfig() *Config {

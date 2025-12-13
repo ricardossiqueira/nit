@@ -77,6 +77,5 @@ func initConfig() {
 }
 
 func GetConfig() *config.Config {
-	// TODO: figure out why unmarshalling is pulling garbage
-	return config.DefaultConfig()
+	return configLoaded
 }

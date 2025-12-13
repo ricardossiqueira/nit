@@ -33,6 +33,7 @@ var draftCmd = &cobra.Command{
 			baseBranch = cfg.GitHub.DefaultBaseBranch
 		}
 
+		fmt.Println(baseBranch)
 		diffCtx, err := git.ParseDiff(baseBranch, cfg.Review.MaxDiffLines)
 		if err != nil {
 			return fmt.Errorf("failed to get diff: %w", err)
