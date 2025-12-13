@@ -7,7 +7,7 @@ package cmd
 import (
 	"fmt"
 
-	"check/internal/git"
+	"nit/internal/git"
 
 	"github.com/spf13/cobra"
 )

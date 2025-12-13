@@ -10,7 +10,7 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	"check/internal/config"
+	"nit/internal/config"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -18,16 +18,16 @@ import (
 
 var configCmd = &cobra.Command{
 	Use:   "config",
-	Short: "Manage check configuration",
+	Short: "Manage nit configuration",
 }
 
 // configCmd represents the config command
 var configInitCmd = &cobra.Command{
 	Use:   "init",
-	Short: "Create a default .check.yaml config file",
+	Short: "Create a default .nit.yaml config file",
 
 	RunE: func(cmd *cobra.Command, args []string) error {
-		cfgPath := ".check.yaml"
+		cfgPath := ".nit.yaml"
 
 		if _, err := os.Stat(cfgPath); err == nil {
 			return fmt.Errorf("config file %s already exists", cfgPath)
@@ -61,7 +61,7 @@ var configEditCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cfgFile := viper.ConfigFileUsed()
 		if cfgFile == "" {
-			cfgFile = ".check.yaml"
+			cfgFile = ".nit.yaml"
 			if _, err := os.Stat(cfgFile); os.IsNotExist(err) {
 				cfg := config.DefaultConfig()
 				if err := cfg.Save(cfgFile); err != nil {

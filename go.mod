@@ -1,4 +1,4 @@
-module check
+module nit
 
 go 1.25.5
 

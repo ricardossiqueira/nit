@@ -36,7 +36,7 @@ type PRStyleConfig struct {
 	TitlePattern       string    `yaml:"title_pattern"`
 	AllowedTypes       []string  `yaml:"allowed_types"`
 	DescriptionSection []Section `yaml:"description_section"`
-	CoverageChecklist  []string  `yaml:"coverage_checklist"`
+	CoverageChecklist  []string  `yaml:"coverage_check_list"`
 }
 
 type ReviewConfig struct {

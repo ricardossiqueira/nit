@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"os"
 
-	"check/internal/config"
+	"nit/internal/config"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -22,9 +22,9 @@ var (
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "check",
+	Use:   "nit",
 	Short: "AI-powered PR assistant",
-	Long: `check helps you create better pull requests with AI-generated
+	Long: `nit helps you create better pull requests with AI-generated
 titles, descriptions and code reviews before pushing to github
 
 Commands:
@@ -34,9 +34,9 @@ Commands:
 	config    Manage configuration
 
 Examples:
-	check draft
-	check draft --base develop
-	check review --mode detailed`,
+	nit draft
+	nit draft --base develop
+	nit review --mode detailed`,
 }
 
 func Execute() {
@@ -48,7 +48,7 @@ func Execute() {
 
 func init() {
 	cobra.OnInitialize(initConfig)
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is .check.yaml, $HOME/.check.yaml)")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is .nit.yaml, $HOME/.nit.yaml)")
 	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "verbose output")
 }
 
@@ -58,7 +58,7 @@ func initConfig() {
 	} else {
 		viper.AddConfigPath(".")
 		viper.AddConfigPath("$HOME")
-		viper.SetConfigName(".check")
+		viper.SetConfigName(".nit")
 
 	}
 
