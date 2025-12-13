@@ -8,6 +8,8 @@ import (
 	"fmt"
 
 	"nit/internal/git"
+	"nit/internal/llm"
+	"nit/internal/output"
 
 	"github.com/spf13/cobra"
 )
@@ -33,14 +35,25 @@ var draftCmd = &cobra.Command{
 			baseBranch = cfg.GitHub.DefaultBaseBranch
 		}
 
-		fmt.Println(baseBranch)
 		diffCtx, err := git.ParseDiff(baseBranch, cfg.Review.MaxDiffLines)
 		if err != nil {
 			return fmt.Errorf("failed to get diff: %w", err)
 		}
 
-		fmt.Println(diffCtx)
-		// TODO: 	continue here
+		prompt, err := llm.BuildDraftPrompt(cfg, diffCtx, lang)
+		if err != nil {
+			return fmt.Errorf("failed to build prompt: %w", err)
+		}
+
+		resp, err := llm.Generate(cfg.Model, prompt)
+		if err != nil {
+			return fmt.Errorf("llm generation failed: %w", err)
+		}
+
+		if err := output.PrintDraft(resp); err != nil {
+			return fmt.Errorf("failed to render draft: %w", err)
+		}
+
 		return nil
 	},
 }
@@ -48,13 +61,6 @@ var draftCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(draftCmd)
 
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// draftCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// draftCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	draftCmd.Flags().StringVar(&baseBranch, "base", "", "base branch for diff (overrides config)")
+	draftCmd.Flags().StringVar(&lang, "lang", "", "force language for description (e.g. pt, en)")
 }
