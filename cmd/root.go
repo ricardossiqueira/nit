@@ -63,9 +63,8 @@ func initConfig() {
 	}
 
 	viper.AutomaticEnv()
-	if err := viper.ReadInConfig(); err == nil {
-		fmt.Println("Using config file: ", viper.ConfigFileUsed())
-	}
+	// TODO: log loaded file?
+	_ = viper.ReadInConfig()
 
 	var cfg config.Config
 	if err := viper.Unmarshal(&cfg); err != nil {
