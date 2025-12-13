@@ -18,34 +18,34 @@ func BuildDraftPrompt(cfg *config.Config, diff *git.DiffContext, langOverride st
 
 	var buf bytes.Buffer
 	// TODO: read and parse from a markdown file
-	fmt.Fprintf(&buf, "Você é um engenheiro de software sênior especializado em Golang.")
-	fmt.Fprintf(&buf, "Gere um título e uma descricão de Pull request em %s.\n", lang)
-	fmt.Fprintf(&buf, "Siga exatamente o formato Markdown abaixo:\n\n")
+	fmt.Fprintf(&buf, "You are a senior software engineer with high proeficiency in %s\n", cfg.Review.Language)
+	fmt.Fprintf(&buf, "Generate a PR title and description in %s.\n", lang)
+	fmt.Fprintf(&buf, "Follow the exact Markdown pattern provided below:\n\n")
 
-	fmt.Fprintf(&buf, "# Título sugerido\n")
+	fmt.Fprintf(&buf, "# Suggested title\n")
 	fmt.Fprintf(&buf, "%s\n\n", cfg.PRStyle.TitlePattern)
 	fmt.Fprintf(&buf, "---\n\n")
 
-	fmt.Fprintf(&buf, "## Contexto\n")
+	fmt.Fprintf(&buf, "## Context\n")
 	fmt.Fprintf(&buf, "- ...\n\n")
 
-	fmt.Fprintf(&buf, "## Mudancas\n")
+	fmt.Fprintf(&buf, "## Changes\n")
 	fmt.Fprintf(&buf, "- ...\n\n")
 
-	fmt.Fprintf(&buf, "## Impacto")
+	fmt.Fprintf(&buf, "## Impact")
 	fmt.Fprintf(&buf, "- ...\n\n")
 
-	fmt.Fprintf(&buf, "## Testes\n\n")
+	fmt.Fprintf(&buf, "## Tests\n\n")
 	fmt.Fprintf(&buf, "- ...\n\n")
 
-	fmt.Fprintf(&buf, "## Checklist de cobertura\n")
+	fmt.Fprintf(&buf, "## Coverage checklist\n")
 	for _, item := range cfg.PRStyle.CoverageChecklist {
 		fmt.Fprintf(&buf, "- [ ] %s\n", item)
 	}
 
-	fmt.Fprintf(&buf, "\n\nResumo das mudancas (para contexto):\n%s\n\n", diff.Summary)
+	fmt.Fprintf(&buf, "\n\nChanges summary (for context):\n%s\n\n", diff.Summary)
 
-	fmt.Fprintf(&buf, "Diff completo (truncado se necessário):\n```%s```\n", diff.RawDiff)
+	fmt.Fprintf(&buf, "Full diff (truncated if necessary):\n```%s```\n", diff.RawDiff)
 
 	return buf.String(), nil
 }

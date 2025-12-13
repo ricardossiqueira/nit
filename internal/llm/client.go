@@ -17,7 +17,6 @@ type LLMResponse struct {
 }
 
 func Generate(modelCfg config.ModelConfig, prompt string) (*LLMResponse, error) {
-	// TODO: implement
 	body := map[string]any{
 		"model": modelCfg.ModelName,
 		"messages": []map[string]string{
@@ -32,7 +31,8 @@ func Generate(modelCfg config.ModelConfig, prompt string) (*LLMResponse, error) 
 		},
 		"max_tokens":  modelCfg.MaxTokens,
 		"temperature": modelCfg.Temperature,
-		"stream":      false,
+		// TODO: implement stream handler
+		"stream": false,
 	}
 
 	data, err := json.Marshal(body)
@@ -66,13 +66,11 @@ func Generate(modelCfg config.ModelConfig, prompt string) (*LLMResponse, error) 
 		return nil, fmt.Errorf("failed to close resp body: %v", err)
 	}
 
-	content := extractContent(raw)
-
-	return &LLMResponse{Content: content}, nil
-}
-
-func extractContent(raw map[string]any) string {
-	// TODO: implement real parsing
 	b, _ := json.Marshal(raw)
-	return string(b)
+	llmRespoonse, err := UnmarshalResponse(b)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse llm response %w", err)
+	}
+
+	return &LLMResponse{Content: llmRespoonse.Message.Content}, nil
 }

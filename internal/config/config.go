@@ -41,7 +41,7 @@ type PRStyleConfig struct {
 
 type ReviewConfig struct {
 	Focus           []string          `mapstruct:"focus"`
-	PythonVersion   string            `mapstruct:"python_version"`
+	Language        string            `mapstruct:"language"`
 	StyleGuide      string            `mapstruct:"style_guide"`
 	MaxDiffLines    int               `mapstruct:"max_diff_lines"`
 	SeverityMapping map[string]string `mapstruct:"severity_mapping"`
@@ -65,16 +65,19 @@ func DefaultConfig() *Config {
 		},
 		Model: ModelConfig{
 			Provider:    "ollama",
-			ModelName:   "deepseek-coder",
-			Endpoint:    "http://localhost:11434/v1/chat",
+			ModelName:   "deepseek-r1:1.5b",
+			Endpoint:    "http://localhost:11434/api/chat",
 			MaxTokens:   2048,
 			Temperature: 0.2,
 			Timeout:     60,
 		},
 		PRStyle: PRStyleConfig{
-			Language:     "pt-BR",
+			Language:     "en-US",
 			TitlePattern: "[{type}] {scope}: {summary}",
 			AllowedTypes: []string{"feat", "fix", "chore", "refactor", "docs"},
+		},
+		Review: ReviewConfig{
+			Language: "golang",
 		},
 	}
 }
