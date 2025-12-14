@@ -10,9 +10,9 @@ import (
 	"nit/internal/llm"
 )
 
-func PrintDraft(resp *llm.LLMResponse) error {
+func PrintDraft(resp *llm.Response) error {
 	// TODO: implempent
-	fmt.Println(resp.Content)
+	fmt.Println(resp.Message.Content)
 
 	path := ".nit_draft.md"
 	abs, err := filepath.Abs(path)
@@ -20,7 +20,7 @@ func PrintDraft(resp *llm.LLMResponse) error {
 		return err
 	}
 
-	if err := os.WriteFile(abs, []byte(resp.Content), 0o644); err != nil {
+	if err := os.WriteFile(abs, []byte(resp.Message.Content), 0o644); err != nil {
 		return err
 	}
 

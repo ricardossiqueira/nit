@@ -1,10 +1,10 @@
 /*
 Package cmd
-Copyright © 2025 NAME HERE <EMAIL ADDRESS>
 */
 package cmd
 
 import (
+	"context"
 	"fmt"
 
 	"nit/internal/git"
@@ -26,6 +26,7 @@ var draftCmd = &cobra.Command{
 
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cfg := GetConfig()
+		store := GetRunStore()
 
 		if cfg == nil {
 			return fmt.Errorf("config not loaded")
@@ -50,6 +51,10 @@ var draftCmd = &cobra.Command{
 			return fmt.Errorf("llm generation failed: %w", err)
 		}
 
+		if err := store.SaveRun(context.TODO(), cfg, resp); err != nil {
+			return fmt.Errorf("failed saving response to the db: %w", err)
+		}
+
 		if err := output.PrintDraft(resp); err != nil {
 			return fmt.Errorf("failed to render draft: %w", err)
 		}
@@ -60,7 +65,6 @@ var draftCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(draftCmd)
-
 	draftCmd.Flags().StringVar(&baseBranch, "base", "", "base branch for diff (overrides config)")
 	draftCmd.Flags().StringVar(&lang, "lang", "", "force language for description (e.g. pt, en)")
 }

@@ -10,6 +10,7 @@ import (
 	"os"
 
 	"nit/internal/config"
+	"nit/internal/db"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -18,6 +19,7 @@ import (
 var (
 	cfgFile      string
 	configLoaded *config.Config
+	store        *db.Store
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -39,11 +41,8 @@ Examples:
 	nit review --mode detailed`,
 }
 
-func Execute() {
-	err := rootCmd.Execute()
-	if err != nil {
-		os.Exit(1)
-	}
+func Execute() error {
+	return rootCmd.Execute()
 }
 
 func init() {
@@ -77,4 +76,12 @@ func initConfig() {
 
 func GetConfig() *config.Config {
 	return configLoaded
+}
+
+func SetRunStore(s *db.Store) {
+	store = s
+}
+
+func GetRunStore() *db.Store {
+	return store
 }
