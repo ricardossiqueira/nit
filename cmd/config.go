@@ -48,6 +48,13 @@ var configShowCmd = &cobra.Command{
 	Short: "Show effective configuration",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		settings := viper.AllSettings()
+
+		if m, _ := cmd.Flags().GetBool("model"); m == true {
+			cfg := GetConfig()
+			fmt.Print(cfg.Model.ModelName)
+			return nil
+		}
+
 		for k, v := range settings {
 			fmt.Printf("%s: %#v\n", k, v)
 		}
@@ -90,8 +97,11 @@ var configEditCmd = &cobra.Command{
 }
 
 func init() {
+	configShowCmd.Flags().Bool("model", true, "Return current model from the config file")
+
 	rootCmd.AddCommand(configCmd)
 	configCmd.AddCommand(configInitCmd)
 	configCmd.AddCommand(configShowCmd)
 	configCmd.AddCommand(configEditCmd)
+
 }
