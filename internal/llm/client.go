@@ -4,6 +4,7 @@ package llm
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -42,7 +43,7 @@ type Message struct {
 	Thinking string `json:"thinking"`
 }
 
-func Generate(modelCfg config.ModelConfig, prompt string) (*Response, error) {
+func Generate(ctx context.Context, store RunStore, modelCfg config.ModelConfig, prompt string) (*Run, error) {
 	body := map[string]any{
 		"model": modelCfg.ModelName,
 		"messages": []map[string]string{
@@ -98,5 +99,21 @@ func Generate(modelCfg config.ModelConfig, prompt string) (*Response, error) {
 		return nil, fmt.Errorf("failed to parse llm response %w", err)
 	}
 
-	return &llmResponse, nil
+	run := &Run{
+		Model:    modelCfg.ModelName,
+		Endpoint: modelCfg.Endpoint,
+		//TODO: fix
+		System:     "Você é um assistente especializado em revisão de código.",
+		Prompt:     prompt,
+		Response:   llmResponse.Message.Content,
+		DurationMS: llmResponse.TotalDuration,
+		CreatedAt:  time.Now(),
+	}
+
+	if store != nil {
+		_ = store.SaveRun(ctx, run)
+	}
+
+	return run, nil
+
 }

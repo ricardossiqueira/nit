@@ -7,7 +7,6 @@ import (
 	"database/sql"
 	"fmt"
 
-	"nit/internal/config"
 	"nit/internal/llm"
 )
 
@@ -21,14 +20,21 @@ func NewStore(db *sql.DB) *Store {
 	}
 }
 
-func (s *Store) SaveRun(ctx context.Context, c *config.Config, r *llm.Response) error {
+func (s *Store) SaveRun(ctx context.Context, r *llm.Run) error {
 	query := `
-		insert into runs (model, endpoint, prompt, response, duration_ms)
-		values ('%s', '%s', '%s', '%s', %d);
+  	INSERT INTO runs (model, endpoint, prompt, response, duration_ms)
+  	VALUES (?, ?, ?, ?, ?);
 	`
-	finalQuery := fmt.Sprintf(query, c.Model.ModelName, c.Model.Endpoint, c.Prompt.SystemInstructions, r.Message.Content, r.TotalDuration)
 
-	_, err := s.DB.Exec(finalQuery)
+	_, err := s.DB.ExecContext(
+		ctx,
+		query,
+		r.Model,
+		r.Endpoint,
+		r.Prompt,
+		r.Response,
+		r.DurationMS,
+	)
 	if err != nil {
 		return fmt.Errorf("error saving run: %w", err)
 	}

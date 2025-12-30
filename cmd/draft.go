@@ -46,12 +46,13 @@ var draftCmd = &cobra.Command{
 			return fmt.Errorf("failed to build prompt: %w", err)
 		}
 
-		resp, err := llm.Generate(cfg.Model, prompt)
+		llmRun := GetRunStore()
+		resp, err := llm.Generate(context.TODO(), llmRun, cfg.Model, prompt)
 		if err != nil {
 			return fmt.Errorf("llm generation failed: %w", err)
 		}
 
-		if err := store.SaveRun(context.TODO(), cfg, resp); err != nil {
+		if err := store.SaveRun(context.TODO(), resp); err != nil {
 			return fmt.Errorf("failed saving response to the db: %w", err)
 		}
 
