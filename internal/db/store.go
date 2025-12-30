@@ -22,14 +22,15 @@ func NewStore(db *sql.DB) *Store {
 
 func (s *Store) SaveRun(ctx context.Context, r *llm.Run) error {
 	query := `
-  	INSERT INTO runs (model, endpoint, prompt, response, duration_ms)
-  	VALUES (?, ?, ?, ?, ?);
+  	INSERT INTO runs (model, current_branch, endpoint, prompt, response, duration_ms)
+  	VALUES (?, ?, ?, ?, ?, ?);
 	`
 
 	_, err := s.DB.ExecContext(
 		ctx,
 		query,
 		r.Model,
+		r.CurrentBranch,
 		r.Endpoint,
 		r.Prompt,
 		r.Response,

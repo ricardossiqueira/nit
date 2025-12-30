@@ -43,7 +43,7 @@ type Message struct {
 	Thinking string `json:"thinking"`
 }
 
-func Generate(ctx context.Context, store RunStore, modelCfg config.ModelConfig, prompt string) (*Run, error) {
+func Generate(ctx context.Context, store RunStore, modelCfg config.ModelConfig, prompt string, currentBranch string) (*Run, error) {
 	body := map[string]any{
 		"model": modelCfg.ModelName,
 		"messages": []map[string]string{
@@ -103,11 +103,12 @@ func Generate(ctx context.Context, store RunStore, modelCfg config.ModelConfig, 
 		Model:    modelCfg.ModelName,
 		Endpoint: modelCfg.Endpoint,
 		//TODO: fix
-		System:     "Você é um assistente especializado em revisão de código.",
-		Prompt:     prompt,
-		Response:   llmResponse.Message.Content,
-		DurationMS: llmResponse.TotalDuration,
-		CreatedAt:  time.Now(),
+		System:        "Você é um assistente especializado em revisão de código.",
+		Prompt:        prompt,
+		Response:      llmResponse.Message.Content,
+		DurationMS:    llmResponse.TotalDuration,
+		CreatedAt:     time.Now(),
+		CurrentBranch: currentBranch,
 	}
 
 	if store != nil {

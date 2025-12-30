@@ -17,17 +17,15 @@ type DiffContext struct {
 	RawDiff      string
 }
 
-var (
-	cmdOut bytes.Buffer
-	cmdErr bytes.Buffer
-)
-
 func ParseDiff(baseBranch string, maxLines int) (*DiffContext, error) {
+	var cmdOut bytes.Buffer
+	var cmdErr bytes.Buffer
+
 	// files changed
-	filesCmd := exec.Command("git", "diff", "--name-only", baseBranch)
-	filesCmd.Stdout = &cmdOut
-	filesCmd.Stderr = &cmdErr
-	err := filesCmd.Run()
+	cmd := exec.Command("git", "diff", "--name-only", baseBranch)
+	cmd.Stdout = &cmdOut
+	cmd.Stderr = &cmdErr
+	err := cmd.Run()
 	if err != nil {
 		return nil, fmt.Errorf("git diff --name-only: %s", cmdErr.String())
 	}
@@ -38,7 +36,7 @@ func ParseDiff(baseBranch string, maxLines int) (*DiffContext, error) {
 		if line == "" {
 			continue
 		}
-		// only python initially
+		//TODO: make land dynamic
 		if strings.HasSuffix(line, ".go") {
 			files = append(files, line)
 		}

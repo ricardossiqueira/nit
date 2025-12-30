@@ -41,13 +41,17 @@ var draftCmd = &cobra.Command{
 			return fmt.Errorf("failed to get diff: %w", err)
 		}
 
+		currentBranchCtx, err := git.GetBranch()
+		if err != nil {
+			return fmt.Errorf("failed to get current branch: %w", err)
+		}
+
 		prompt, err := llm.BuildDraftPrompt(cfg, diffCtx, lang)
 		if err != nil {
 			return fmt.Errorf("failed to build prompt: %w", err)
 		}
 
-		llmRun := GetRunStore()
-		resp, err := llm.Generate(context.TODO(), llmRun, cfg.Model, prompt)
+		resp, err := llm.Generate(context.TODO(), store, cfg.Model, prompt, currentBranchCtx.Name)
 		if err != nil {
 			return fmt.Errorf("llm generation failed: %w", err)
 		}

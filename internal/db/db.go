@@ -24,6 +24,7 @@ func Open(path string) (*sql.DB, error) {
 			(
 				id INTEGER PRIMARY KEY autoincrement,
 				model TEXT,
+				current_branch TEXT,
 				endpoint TEXT,
 				prompt TEXT,
 				response TEXT,
