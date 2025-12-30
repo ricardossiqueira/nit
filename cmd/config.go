@@ -14,7 +14,10 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"go.yaml.in/yaml/v3"
 )
+
+var showModelOnly bool
 
 var configCmd = &cobra.Command{
 	Use:   "config",
@@ -47,17 +50,19 @@ var configShowCmd = &cobra.Command{
 	Use:   "show",
 	Short: "Show effective configuration",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		settings := viper.AllSettings()
-
-		if m, _ := cmd.Flags().GetBool("model"); m == true {
+		if showModelOnly == true {
 			cfg := GetConfig()
 			fmt.Print(cfg.Model.ModelName)
 			return nil
 		}
 
-		for k, v := range settings {
-			fmt.Printf("%s: %#v\n", k, v)
+		allSettings := viper.AllSettings()
+		yamlBytes, err := yaml.Marshal(allSettings)
+		if err != nil {
+			return err
 		}
+		fmt.Println(string(yamlBytes))
+
 		return nil
 	},
 }
@@ -97,7 +102,7 @@ var configEditCmd = &cobra.Command{
 }
 
 func init() {
-	configShowCmd.Flags().Bool("model", true, "Return current model from the config file")
+	configShowCmd.Flags().BoolVarP(&showModelOnly, "model", "m", false, "Return current model from the config file")
 
 	rootCmd.AddCommand(configCmd)
 	configCmd.AddCommand(configInitCmd)
