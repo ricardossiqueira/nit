@@ -17,35 +17,58 @@ func BuildDraftPrompt(cfg *config.Config, diff *git.DiffContext, langOverride st
 	}
 
 	var buf bytes.Buffer
-	// TODO: read and parse from a markdown file
-	fmt.Fprintf(&buf, "You are a senior software engineer with high proeficiency in %s\n", cfg.Review.Language)
-	fmt.Fprintf(&buf, "Generate a PR title and description in %s.\n", lang)
-	fmt.Fprintf(&buf, "Follow the exact Markdown pattern provided below:\n\n")
 
-	fmt.Fprintf(&buf, "# Suggested title\n")
-	fmt.Fprintf(&buf, "%s\n\n", cfg.PRStyle.TitlePattern)
-	fmt.Fprintf(&buf, "---\n\n")
+	// INSTRUÇÕES EM INGLÊS (melhor compreensão do LLM)
+	fmt.Fprintf(&buf, `You are a senior software engineer proficient in %s.
 
-	fmt.Fprintf(&buf, "## Context\n")
-	fmt.Fprintf(&buf, "- ...\n\n")
+ANALYZE the git diff below and RETURN ONLY VALID JSON in this EXACT format:
 
-	fmt.Fprintf(&buf, "## Changes\n")
-	fmt.Fprintf(&buf, "- ...\n\n")
+{
+  "pr_title": "[concise PR title in %s, max 72 chars]",
+  "pr_description": "[detailed description in %s following the Markdown template below]", 
+  "commit_message": "[conventional commit message in %s: type: short message]"
+}
 
-	fmt.Fprintf(&buf, "## Impact")
-	fmt.Fprintf(&buf, "- ...\n\n")
+IMPORTANT: 
+- Output ONLY JSON, no explanations or extra text
+- pr_title: maximum 72 characters
+- pr_description: use the EXACT Markdown template below
+- commit_message: conventional commits format (feat:, fix:, etc.)
 
-	fmt.Fprintf(&buf, "## Tests\n\n")
-	fmt.Fprintf(&buf, "- ...\n\n")
+Use this EXACT Markdown template for pr_description:
 
-	fmt.Fprintf(&buf, "## Coverage checklist\n")
+`, cfg.Review.Language, lang, lang, lang)
+
+	// TEMPLATE Markdown (permanece igual)
+	fmt.Fprintf(&buf, `# %s
+
+## Context
+- ...
+
+## Changes
+- ...
+
+## Impact
+- ...
+
+## Tests
+- ...
+
+## Coverage checklist
+`, cfg.PRStyle.TitlePattern)
+
 	for _, item := range cfg.PRStyle.CoverageChecklist {
-		fmt.Fprintf(&buf, "- [ ] %s\n", item)
+		fmt.Fprintf(&buf, `- [ ] %s\n`, item)
 	}
 
-	fmt.Fprintf(&buf, "\n\nChanges summary (for context):\n%s\n\n", diff.Summary)
+	fmt.Fprintf(&buf, `
 
-	fmt.Fprintf(&buf, "Full diff (truncated if necessary):\n```%s```\n", diff.RawDiff)
+**Changes summary:**
+%s
+
+**Full diff:**
+diff
+%s`, diff.Summary, diff.RawDiff)
 
 	return buf.String(), nil
 }
