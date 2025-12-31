@@ -11,3 +11,11 @@
 - [ ] implement custom markdown prompt
 - [ ] improve markdown parsing
 - [ ] use ollama stream response
+
+
+
+### Usage
+
+```sh
+go run . draft -m commit | git commit -F -
+```
