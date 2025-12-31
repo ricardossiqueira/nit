@@ -17,4 +17,5 @@
 ### Usage
 
 ```sh
-go run . draft -f commit | git commit -F - ```
+go run . draft -f commit | git commit -F -
+```
