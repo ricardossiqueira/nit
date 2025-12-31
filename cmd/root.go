@@ -69,7 +69,7 @@ func initConfig() {
 	if err := viper.Unmarshal(&cfg); err != nil {
 		fmt.Printf("Error unmarshalling config: %v\n", err)
 		os.Exit(1)
-
+		// random comment
 	}
 	configLoaded = &cfg
 }

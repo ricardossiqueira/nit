@@ -96,12 +96,12 @@ func Generate(ctx context.Context, store RunStore, modelCfg config.ModelConfig, 
 	b, _ := json.Marshal(raw)
 	llmResponse, err := UnmarshalResponse(b)
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse llm response %w", err)
+		return nil, fmt.Errorf("failed to parse llm response: %w", err)
 	}
 
-	llmResponseJSON, err := UnmarshalDraftOutput([]byte(llmResponse.Message.Content))
+	llmResponseJSON, err := ParseDraftOutput(llmResponse.Message.Content)
 	if err != nil {
-		return nil, fmt.Errorf("failed to unmarshal llm response %w", err)
+		return nil, fmt.Errorf("failed to unmarshal llm response: %w", err)
 	}
 
 	run := &Run{
@@ -110,7 +110,7 @@ func Generate(ctx context.Context, store RunStore, modelCfg config.ModelConfig, 
 		//TODO: fix
 		System:        "Você é um assistente especializado em revisão de código.",
 		Prompt:        prompt,
-		Response:      llmResponseJSON,
+		Response:      *llmResponseJSON,
 		DurationMS:    llmResponse.TotalDuration,
 		CreatedAt:     time.Now(),
 		CurrentBranch: currentBranch,
