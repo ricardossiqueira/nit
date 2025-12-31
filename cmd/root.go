@@ -62,7 +62,6 @@ func initConfig() {
 	}
 
 	viper.AutomaticEnv()
-	// TODO: log loaded file?
 	_ = viper.ReadInConfig()
 
 	var cfg config.Config

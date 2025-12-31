@@ -44,12 +44,13 @@ type Message struct {
 }
 
 func Generate(ctx context.Context, store RunStore, modelCfg config.ModelConfig, prompt string, currentBranch string) (*Run, error) {
+	systemMessage := "You are an assistant specialized in code reviews."
 	body := map[string]any{
 		"model": modelCfg.ModelName,
 		"messages": []map[string]string{
 			{
 				"role":    "system",
-				"content": "Você é um assistente especializado em revisão de código.",
+				"content": systemMessage,
 			},
 			{
 				"role":    "user",
@@ -58,8 +59,7 @@ func Generate(ctx context.Context, store RunStore, modelCfg config.ModelConfig, 
 		},
 		"max_tokens":  modelCfg.MaxTokens,
 		"temperature": modelCfg.Temperature,
-		// TODO: implement stream handler
-		"stream": false,
+		"stream":      false,
 	}
 
 	data, err := json.Marshal(body)
@@ -105,10 +105,9 @@ func Generate(ctx context.Context, store RunStore, modelCfg config.ModelConfig, 
 	}
 
 	run := &Run{
-		Model:    modelCfg.ModelName,
-		Endpoint: modelCfg.Endpoint,
-		//TODO: fix
-		System:        "Você é um assistente especializado em revisão de código.",
+		Model:         modelCfg.ModelName,
+		Endpoint:      modelCfg.Endpoint,
+		System:        systemMessage,
 		Prompt:        prompt,
 		Response:      *llmResponseJSON,
 		DurationMS:    llmResponse.TotalDuration,
