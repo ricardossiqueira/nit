@@ -12,7 +12,7 @@ type Run struct {
 	Endpoint      string
 	System        string
 	Prompt        string
-	Response      string
+	Response      DraftOutput
 	DurationMS    int64
 	CreatedAt     time.Time
 	CurrentBranch string

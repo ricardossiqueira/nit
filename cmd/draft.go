@@ -60,9 +60,7 @@ var draftCmd = &cobra.Command{
 			return fmt.Errorf("failed saving response to the db: %w", err)
 		}
 
-		if err := output.PrintDraft(resp); err != nil {
-			return fmt.Errorf("failed to render draft: %w", err)
-		}
+		output.PrintDraft(resp)
 
 		return nil
 	},

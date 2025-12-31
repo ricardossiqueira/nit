@@ -26,14 +26,19 @@ func (s *Store) SaveRun(ctx context.Context, r *llm.Run) error {
   	VALUES (?, ?, ?, ?, ?, ?);
 	`
 
-	_, err := s.DB.ExecContext(
+	responseJSON, err := r.Response.Marshal()
+	if err != nil {
+		return err
+	}
+
+	_, err = s.DB.ExecContext(
 		ctx,
 		query,
 		r.Model,
 		r.CurrentBranch,
 		r.Endpoint,
 		r.Prompt,
-		r.Response,
+		responseJSON,
 		r.DurationMS,
 	)
 	if err != nil {

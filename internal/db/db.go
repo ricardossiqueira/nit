@@ -27,7 +27,7 @@ func Open(path string) (*sql.DB, error) {
 				current_branch TEXT,
 				endpoint TEXT,
 				prompt TEXT,
-				response TEXT,
+				response	JSON,
 				status_code INTEGER,
 				duration_ms INTEGER,
 				created_at DATETIME default (datetime('now'))
