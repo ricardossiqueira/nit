@@ -47,7 +47,7 @@ func Execute() error {
 
 func init() {
 	cobra.OnInitialize(initConfig)
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is .nit.yaml, $HOME/.nit.yaml)")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is nit.yaml, $HOME/nit.yaml)")
 	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "verbose output")
 }
 
@@ -57,7 +57,7 @@ func initConfig() {
 	} else {
 		viper.AddConfigPath(".")
 		viper.AddConfigPath("$HOME")
-		viper.SetConfigName(".nit")
+		viper.SetConfigName("nit")
 
 	}
 

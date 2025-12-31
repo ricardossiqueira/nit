@@ -1,0 +1,30 @@
+github:
+    defaultbasebranch: master
+    useghcli: true
+model:
+    provider: ollama
+    modelname: deepseek-r1:1.5b
+    endpoint: http://localhost:11434/api/chat
+    maxtokens: 2048
+    temperature: 0.2
+    timeout: 60
+prstyle:
+    language: en-US
+    titlepattern: '[{type}] {scope}: {summary}'
+    allowedtypes:
+        - feat
+        - fix
+        - chore
+        - refactor
+        - docs
+    descriptionsection: []
+    coveragechecklist: []
+review:
+    focus: []
+    language: golang
+    styleguide: ""
+    maxdifflines: 0
+    severitymapping: {}
+prompt:
+    systeminstructions: ""
+    extrarules: []

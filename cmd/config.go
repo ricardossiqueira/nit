@@ -27,10 +27,10 @@ var configCmd = &cobra.Command{
 // configCmd represents the config command
 var configInitCmd = &cobra.Command{
 	Use:   "init",
-	Short: "Create a default .nit.yaml config file",
+	Short: "Create a default nit.yaml config file",
 
 	RunE: func(cmd *cobra.Command, args []string) error {
-		cfgPath := ".nit.yaml"
+		cfgPath := "nit.yaml"
 
 		if _, err := os.Stat(cfgPath); err == nil {
 			return fmt.Errorf("config file %s already exists", cfgPath)
@@ -73,7 +73,7 @@ var configEditCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cfgFile := viper.ConfigFileUsed()
 		if cfgFile == "" {
-			cfgFile = ".nit.yaml"
+			cfgFile = "nit.yaml"
 			if _, err := os.Stat(cfgFile); os.IsNotExist(err) {
 				cfg := config.DefaultConfig()
 				if err := cfg.Save(cfgFile); err != nil {

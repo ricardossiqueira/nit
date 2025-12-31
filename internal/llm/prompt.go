@@ -18,7 +18,6 @@ func BuildDraftPrompt(cfg *config.Config, diff *git.DiffContext, langOverride st
 
 	var buf bytes.Buffer
 
-	// INSTRUÇÕES EM INGLÊS (melhor compreensão do LLM)
 	fmt.Fprintf(&buf, `You are a senior software engineer proficient in %s.
 
 ANALYZE the git diff below and RETURN ONLY VALID JSON in this EXACT format:
@@ -39,7 +38,6 @@ Use this EXACT Markdown template for pr_description:
 
 `, cfg.Review.Language, lang, lang, lang)
 
-	// TEMPLATE Markdown (permanece igual)
 	fmt.Fprintf(&buf, `# %s
 
 ## Context

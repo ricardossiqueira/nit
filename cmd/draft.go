@@ -15,8 +15,9 @@ import (
 )
 
 var (
-	baseBranch string
-	lang       string
+	baseBranch   string
+	lang         string
+	outputFormat string
 )
 
 // draftCmd represents the draft command
@@ -60,13 +61,16 @@ var draftCmd = &cobra.Command{
 			return fmt.Errorf("failed saving response to the db: %w", err)
 		}
 
-		output.PrintDraft(resp)
+		output.PrintDraft(resp, output.OutputFormat(outputFormat))
 
 		return nil
 	},
 }
 
 func init() {
+	draftCmd.Flags().StringVarP(&outputFormat, "format", "f", "pretty",
+		"output format: pretty, json, commit, pr-title, pr-body")
+
 	rootCmd.AddCommand(draftCmd)
 	draftCmd.Flags().StringVar(&baseBranch, "base", "", "base branch for diff (overrides config)")
 	draftCmd.Flags().StringVar(&lang, "lang", "", "force language for description (e.g. pt, en)")
