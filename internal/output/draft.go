@@ -21,7 +21,6 @@ const (
 )
 
 func PrintDraft(resp *llm.Run, format OutputFormat) error {
-	// test comment
 	switch format {
 	case FormatPretty:
 		fmt.Printf("🆕 **PR Title:** %s\n\n📝 **Description:**\n%s\n\n💬 **Commit:** %s\n",
