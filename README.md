@@ -6,16 +6,31 @@
 
 - [x] implement git integration
 - [x] implement ollama client
-- [ ] implement github client
+- [x] implement github client
 - [x] implement sqlite manager
 - [ ] implement custom markdown prompt
-- [ ] improve markdown parsing
-- [ ] use ollama stream response
+- [x] improve markdown parsing
+- [x] use ollama stream response
 
 
 
-### Usage
+### Suggested flow
 
 ```sh
-go run . draft -f commit | git commit -F -
+git checkout -b my-branch
 ```
+```sh
+git add .
+```
+```sh
+go run . draft
+```
+```sh
+git commit -m $(go run . draft -l -f commit)
+```
+```sh
+set TITLE $(go run . draft -l -f pr-title) 
+set BODY $(go run . draft -l -f pr-body)
+gh pr create --title "$TITLE" --body-file "$BODY"
+```
+
