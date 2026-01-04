@@ -1,3 +1,0 @@
-/*Package output
- */
-package output

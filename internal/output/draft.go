@@ -1,45 +1,25 @@
-/*Package output
- */
 package output
 
-import (
-	"encoding/json"
-	"fmt"
-	"os"
+import "fmt"
 
-	"nit/internal/llm"
-)
+func PrintCommit(msg string) error {
+	fmt.Println(msg)
+	return nil
+}
 
-type OutputFormat string
+func PrintPR(title string, body string) error {
+	fmt.Println(title)
+	fmt.Println()
+	fmt.Println(body)
+	return nil
+}
 
-const (
-	FormatPretty  OutputFormat = "pretty"
-	FormatJSON    OutputFormat = "json"
-	FormatCommit  OutputFormat = "commit"
-	FormatPRTitle OutputFormat = "pr-title"
-	FormatPRBody  OutputFormat = "pr-body"
-	FormatPR      OutputFormat = "pr"
-)
+func PrintTitle(title string) error {
+	fmt.Println(title)
+	return nil
+}
 
-func PrintDraft(resp *llm.DraftOutput, format OutputFormat) error {
-	switch format {
-	case FormatPretty:
-		fmt.Printf("🆕 **PR Title:** %s\n\n📝 **Description:**\n%s\n\n💬 **Commit:** %s\n",
-			resp.PRTitle, resp.PRDescription, resp.CommitMessage)
-	case FormatJSON:
-		if err := json.NewEncoder(os.Stdout).Encode(resp); err != nil {
-			return fmt.Errorf("failed encoding json response: %w", err)
-		}
-	case FormatCommit:
-		fmt.Println(resp.CommitMessage)
-	case FormatPRTitle:
-		fmt.Println(resp.PRTitle)
-	case FormatPRBody:
-		fmt.Println(resp.PRDescription)
-	case FormatPR:
-		fmt.Println(resp.PRTitle)
-		fmt.Println()
-		fmt.Println(resp.PRDescription)
-	}
+func PrintBody(body string) error {
+	fmt.Println(body)
 	return nil
 }

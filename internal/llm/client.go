@@ -43,7 +43,7 @@ type Message struct {
 	Thinking string `json:"thinking"`
 }
 
-func Generate(ctx context.Context, store RunStore, modelCfg config.ModelConfig, prompt *DraftPrompt, currentBranch string) (*Run, error) {
+func Generate(ctx context.Context, store RunStore, modelCfg config.ModelConfig, prompt *DraftPrompt, currentBranch string, runType string) (*Run, error) {
 	body := map[string]any{
 		"model": modelCfg.ModelName,
 		"messages": []map[string]string{
@@ -98,20 +98,16 @@ func Generate(ctx context.Context, store RunStore, modelCfg config.ModelConfig, 
 		return nil, fmt.Errorf("failed to parse llm response: %w", err)
 	}
 
-	llmResponseJSON, err := ParseDraftOutput(llmResponse.Message.Content)
-	if err != nil {
-		return nil, fmt.Errorf("failed to unmarshal llm response: %w", err)
-	}
-
 	run := &Run{
 		Model:         modelCfg.ModelName,
 		Endpoint:      modelCfg.Endpoint,
-		System:        prompt.System,
-		Prompt:        prompt.User,
-		Response:      *llmResponseJSON,
+		SystemPrompt:  prompt.System,
+		UserPrompt:    prompt.User,
+		Response:      llmResponse.Message.Content,
 		DurationMS:    llmResponse.TotalDuration,
 		CreatedAt:     time.Now(),
 		CurrentBranch: currentBranch,
+		Type:          runType,
 	}
 
 	if store != nil {

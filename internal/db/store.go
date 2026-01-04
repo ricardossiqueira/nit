@@ -22,23 +22,20 @@ func NewStore(db *sql.DB) *Store {
 
 func (s *Store) SaveRun(ctx context.Context, r *llm.Run) error {
 	query := `
-  	INSERT INTO runs (model, current_branch, endpoint, prompt, response, duration_ms)
-  	VALUES (?, ?, ?, ?, ?, ?);
+  	INSERT INTO runs (model, current_branch, endpoint, system_prompt, user_prompt, type, response, duration_ms)
+  	VALUES (?, ?, ?, ?, ?, ?, ?, ?);
 	`
 
-	responseJSON, err := r.Response.Marshal()
-	if err != nil {
-		return err
-	}
-
-	_, err = s.DB.ExecContext(
+	_, err := s.DB.ExecContext(
 		ctx,
 		query,
 		r.Model,
 		r.CurrentBranch,
 		r.Endpoint,
-		r.Prompt,
-		responseJSON,
+		r.SystemPrompt,
+		r.UserPrompt,
+		r.Type,
+		r.Response,
 		r.DurationMS,
 	)
 	if err != nil {
@@ -90,4 +87,23 @@ func (s *Store) GetLastDraft(ctx context.Context) (*llm.DraftOutput, error) {
 	}
 
 	return &draft, nil
+}
+
+func (s *Store) GetLastByType(ctx context.Context, runType string) (string, error) {
+	query := `
+        SELECT response
+        FROM runs
+        WHERE type = ?
+        ORDER BY id DESC
+        LIMIT 1
+    `
+
+	row := s.DB.QueryRowContext(ctx, query, runType)
+
+	var resp string
+	if err := row.Scan(&resp); err != nil {
+		return "", fmt.Errorf("run of type %s not found: %w", runType, err)
+	}
+
+	return resp, nil
 }
