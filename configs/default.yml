@@ -4,7 +4,7 @@ github:
 
 model:
   provider: "ollama"
-  model_name: "deepseek-coder"
+  model_name: "deepseek-coder-v2"
   endpoint: "http://localhost:11434/v1/chat"
   max_tokens: 2048
   temperature: 0.2
@@ -37,4 +37,3 @@ review:
   python_version: "3.11"
   style_guide: "pep8"
   max_diff_lines: 800
-

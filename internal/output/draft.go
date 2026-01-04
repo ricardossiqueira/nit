@@ -27,7 +27,9 @@ func PrintDraft(resp *llm.DraftOutput, format OutputFormat) error {
 		fmt.Printf("🆕 **PR Title:** %s\n\n📝 **Description:**\n%s\n\n💬 **Commit:** %s\n",
 			resp.PRTitle, resp.PRDescription, resp.CommitMessage)
 	case FormatJSON:
-		json.NewEncoder(os.Stdout).Encode(resp)
+		if err := json.NewEncoder(os.Stdout).Encode(resp); err != nil {
+			return fmt.Errorf("failed encoding json response: %w", err)
+		}
 	case FormatCommit:
 		fmt.Println(resp.CommitMessage)
 	case FormatPRTitle:
