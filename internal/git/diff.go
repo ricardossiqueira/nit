@@ -36,13 +36,13 @@ func ParseDiff(baseBranch string, maxLines int) (*DiffContext, error) {
 		if line == "" {
 			continue
 		}
-		//TODO: make lang dynamic
+		// TODO: make lang dynamic
 		// if strings.HasSuffix(line, ".go") {
 		// 	files = append(files, line)
 		// }
 	}
 
-	//TODO: support diff files
+	// TODO: support diff files
 	// diff
 	diffCmd := exec.Command("git", "diff", baseBranch, "--", "*")
 	diffOut, err := diffCmd.Output()

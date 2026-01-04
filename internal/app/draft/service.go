@@ -5,6 +5,7 @@ package draft
 import (
 	"context"
 	"fmt"
+
 	"nit/internal/config"
 	"nit/internal/db"
 	"nit/internal/git"
@@ -61,7 +62,9 @@ func Generate(cfg *config.Config, store *db.Store, runID string, useLast bool, o
 		return fmt.Errorf("failed saving response to the db: %w", err)
 	}
 
-	output.PrintDraft(&resp.Response, output.OutputFormat(outputFormat))
+	if err := output.PrintDraft(&resp.Response, output.OutputFormat(outputFormat)); err != nil {
+		return fmt.Errorf("faile do print draft: %w", err)
+	}
 
 	return nil
 }
