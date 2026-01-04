@@ -111,7 +111,7 @@ func Generate(ctx context.Context, store RunStore, modelCfg config.ModelConfig, 
 	}
 
 	if store != nil {
-		if err := store.SaveRun(ctx, run); err != nil {
+		if err := store.SaveRun(ctx, ToDBRun(run)); err != nil {
 			return nil, fmt.Errorf("failed to save run: %w", err)
 		}
 	}

@@ -15,7 +15,14 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	store := db.NewStore(sqliteDB)
+	if err := db.InitSchema(sqliteDB); err != nil {
+		log.Fatal(err)
+	}
+
+	store, err := db.NewStore(sqliteDB)
+	if err != nil {
+		log.Fatal(err)
+	}
 	cmd.SetRunStore(store)
 	if err := cmd.Execute(); err != nil {
 		log.Fatal(err)
