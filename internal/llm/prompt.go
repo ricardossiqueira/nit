@@ -5,6 +5,9 @@ package llm
 import (
 	"bytes"
 	"fmt"
+	"os"
+	"path/filepath"
+	"text/template"
 
 	"nit/internal/config"
 	"nit/internal/git"
@@ -15,27 +18,38 @@ type DraftPrompt struct {
 	User   string
 }
 
+type promptTemplateData struct {
+	Language          string
+	TitleMax          int
+	TitlePattern      string
+	Sections          []config.Section
+	CoverageChecklist []string
+	Summary           string
+	RawDiff           string
+}
+
 func BuildCommitPrompt(cfg *config.Config, diff *git.DiffContext, langOverride string) (*DraftPrompt, error) {
 	lang := cfg.PRStyle.Language
 	if langOverride != "" {
 		lang = langOverride
 	}
 
-	var systemPrompt bytes.Buffer
-	var userPrompt bytes.Buffer
+	data := promptTemplateData{
+		Language: lang,
+		Summary:  diff.Summary,
+		RawDiff:  diff.RawDiff,
+	}
 
-	fmt.Fprintf(&systemPrompt, "Você é um engenheiro de software experiente. Gere apenas uma mensagem de commit no formato conventional commits (ex: feat: algo curto) em %s. Seja conciso.\n", lang)
+	systemPrompt, err := renderPromptTemplate(filepath.Join("prompts", "commit.md"), data)
+	if err != nil {
+		return nil, fmt.Errorf("failed to render commit prompt: %w", err)
+	}
 
-	fmt.Fprintf(
-		&userPrompt,
-		"Resumo das mudanças:\n%s\n\nDiff completo:\n%s",
-		diff.Summary,
-		diff.RawDiff,
-	)
+	userPrompt := fmt.Sprintf("Resumo das mudanças:\n%s\n\nDiff completo:\n%s", diff.Summary, diff.RawDiff)
 
 	return &DraftPrompt{
-		System: systemPrompt.String(),
-		User:   userPrompt.String(),
+		System: systemPrompt,
+		User:   userPrompt,
 	}, nil
 }
 
@@ -49,15 +63,24 @@ func BuildPRTitlePrompt(cfg *config.Config, diff *git.DiffContext, langOverride 
 		titleMax = 72
 	}
 
-	var systemPrompt bytes.Buffer
-	var userPrompt bytes.Buffer
+	data := promptTemplateData{
+		Language:     lang,
+		TitleMax:     titleMax,
+		TitlePattern: cfg.PRStyle.Title.Pattern,
+		Summary:      diff.Summary,
+		RawDiff:      diff.RawDiff,
+	}
 
-	fmt.Fprintf(&systemPrompt, "Você é um engenheiro de software experiente. Escreva apenas um título de PR curto em %s, máximo de %d caracteres, seguindo o padrão %q. Não inclua mais nada além do título.\n", lang, titleMax, cfg.PRStyle.Title.Pattern)
-	fmt.Fprintf(&userPrompt, "Resumo das mudanças:\n%s\n\nDiff completo:\n%s", diff.Summary, diff.RawDiff)
+	systemPrompt, err := renderPromptTemplate(filepath.Join("prompts", "title.md"), data)
+	if err != nil {
+		return nil, fmt.Errorf("failed to render pr title prompt: %w", err)
+	}
+
+	userPrompt := fmt.Sprintf("Resumo das mudanças:\n%s\n\nDiff completo:\n%s", diff.Summary, diff.RawDiff)
 
 	return &DraftPrompt{
-		System: systemPrompt.String(),
-		User:   userPrompt.String(),
+		System: systemPrompt,
+		User:   userPrompt,
 	}, nil
 }
 
@@ -67,31 +90,42 @@ func BuildPRBodyPrompt(cfg *config.Config, diff *git.DiffContext, langOverride s
 		lang = langOverride
 	}
 
-	var systemPrompt bytes.Buffer
-	var userPrompt bytes.Buffer
-
-	fmt.Fprintf(&systemPrompt, "Você é um engenheiro de software experiente. Escreva apenas a descrição detalhada do PR em %s usando markdown.\n", lang)
-
-	if len(cfg.PRStyle.DescriptionSections) == 0 {
-		fmt.Fprintf(&systemPrompt, "Use este template:\n## Contexto\n- ...\n\n## Mudanças\n- ...\n\n## Impacto\n- ...\n\n## Testes\n- ...\n")
-	} else {
-		fmt.Fprintf(&systemPrompt, "Use este template com tópicos:\n")
-		for _, section := range cfg.PRStyle.DescriptionSections {
-			fmt.Fprintf(&systemPrompt, "## %s\n- ...\n\n", section.Name)
-		}
+	data := promptTemplateData{
+		Language:          lang,
+		Sections:          cfg.PRStyle.DescriptionSections,
+		CoverageChecklist: cfg.PRStyle.CoverageChecklist,
+		Summary:           diff.Summary,
+		RawDiff:           diff.RawDiff,
 	}
 
-	if len(cfg.PRStyle.CoverageChecklist) > 0 {
-		fmt.Fprintf(&systemPrompt, "Checklist de cobertura:\n")
-		for _, item := range cfg.PRStyle.CoverageChecklist {
-			fmt.Fprintf(&systemPrompt, "- [ ] %s\n", item)
-		}
+	systemPrompt, err := renderPromptTemplate(filepath.Join("prompts", "body.md"), data)
+	if err != nil {
+		return nil, fmt.Errorf("failed to render pr body prompt: %w", err)
 	}
 
-	fmt.Fprintf(&userPrompt, "Resumo das mudanças:\n%s\n\nDiff completo:\n%s", diff.Summary, diff.RawDiff)
+	userPrompt := fmt.Sprintf("Resumo das mudanças:\n%s\n\nDiff completo:\n%s", diff.Summary, diff.RawDiff)
 
 	return &DraftPrompt{
-		System: systemPrompt.String(),
-		User:   userPrompt.String(),
+		System: systemPrompt,
+		User:   userPrompt,
 	}, nil
+}
+
+func renderPromptTemplate(path string, data promptTemplateData) (string, error) {
+	content, err := os.ReadFile(path)
+	if err != nil {
+		return "", fmt.Errorf("read prompt template %s: %w", path, err)
+	}
+
+	tmpl, err := template.New(filepath.Base(path)).Parse(string(content))
+	if err != nil {
+		return "", fmt.Errorf("parse prompt template %s: %w", path, err)
+	}
+
+	var buf bytes.Buffer
+	if err := tmpl.Execute(&buf, data); err != nil {
+		return "", fmt.Errorf("execute prompt template %s: %w", path, err)
+	}
+
+	return buf.String(), nil
 }
