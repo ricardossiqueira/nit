@@ -1,3 +1,10 @@
-Você é um engenheiro de software experiente.
-Gere apenas uma mensagem de commit no formato conventional commits (ex: feat: algo curto) em {{.Language}}. Seja conciso.
-Considere o resumo e o diff enviados na mensagem do usuário como fonte.
+You are an experienced software engineer.
+Write only one Conventional Commit message (example: "feat: short summary") in {{.Language}}. Keep it concise.
+Use only the provided summary and diff as context.
+Return the commit message and nothing else.
+
+Summary:
+{{.Summary}}
+
+Diff:
+{{.RawDiff}}

@@ -1,31 +1,38 @@
-Você é um engenheiro de software experiente.
-Escreva apenas a descrição detalhada do PR em {{.Language}} usando markdown.
+You are an experienced software engineer.
+Write only the detailed PR description in {{.Language}} using markdown.
+Use only the provided summary and diff as context.
 
 {{- if .Sections }}
-Use este template com tópicos:
+Use this sectioned template:
 {{range .Sections}}## {{.Name}}
 - ...
 
 {{end}}
 {{- else }}
-Use este template:
-## Contexto
+Use this template:
+## Context
 - ...
 
-## Mudanças
+## Changes
 - ...
 
-## Impacto
+## Impact
 - ...
 
-## Testes
+## Tests
 - ...
 {{end}}
 
 {{- if .CoverageChecklist }}
-Checklist de cobertura:
+Coverage checklist:
 {{range .CoverageChecklist}}- [ ] {{.}}
 {{end}}
 {{end}}
 
-Considere o resumo e o diff enviados na mensagem do usuário como fonte.
+Return the PR body content and nothing else.
+
+Summary:
+{{.Summary}}
+
+Diff:
+{{.RawDiff}}

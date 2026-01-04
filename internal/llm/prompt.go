@@ -40,16 +40,14 @@ func BuildCommitPrompt(cfg *config.Config, diff *git.DiffContext, langOverride s
 		RawDiff:  diff.RawDiff,
 	}
 
-	systemPrompt, err := renderPromptTemplate(filepath.Join("prompts", "commit.md"), data)
+	prompt, err := renderPromptTemplate(filepath.Join("prompts", "commit.md"), data)
 	if err != nil {
 		return nil, fmt.Errorf("failed to render commit prompt: %w", err)
 	}
 
-	userPrompt := fmt.Sprintf("Resumo das mudanças:\n%s\n\nDiff completo:\n%s", diff.Summary, diff.RawDiff)
-
 	return &DraftPrompt{
-		System: systemPrompt,
-		User:   userPrompt,
+		System: prompt,
+		User:   "",
 	}, nil
 }
 
@@ -71,16 +69,14 @@ func BuildPRTitlePrompt(cfg *config.Config, diff *git.DiffContext, langOverride 
 		RawDiff:      diff.RawDiff,
 	}
 
-	systemPrompt, err := renderPromptTemplate(filepath.Join("prompts", "title.md"), data)
+	prompt, err := renderPromptTemplate(filepath.Join("prompts", "title.md"), data)
 	if err != nil {
 		return nil, fmt.Errorf("failed to render pr title prompt: %w", err)
 	}
 
-	userPrompt := fmt.Sprintf("Resumo das mudanças:\n%s\n\nDiff completo:\n%s", diff.Summary, diff.RawDiff)
-
 	return &DraftPrompt{
-		System: systemPrompt,
-		User:   userPrompt,
+		System: prompt,
+		User:   "",
 	}, nil
 }
 
@@ -98,16 +94,14 @@ func BuildPRBodyPrompt(cfg *config.Config, diff *git.DiffContext, langOverride s
 		RawDiff:           diff.RawDiff,
 	}
 
-	systemPrompt, err := renderPromptTemplate(filepath.Join("prompts", "body.md"), data)
+	prompt, err := renderPromptTemplate(filepath.Join("prompts", "body.md"), data)
 	if err != nil {
 		return nil, fmt.Errorf("failed to render pr body prompt: %w", err)
 	}
 
-	userPrompt := fmt.Sprintf("Resumo das mudanças:\n%s\n\nDiff completo:\n%s", diff.Summary, diff.RawDiff)
-
 	return &DraftPrompt{
-		System: systemPrompt,
-		User:   userPrompt,
+		System: prompt,
+		User:   "",
 	}, nil
 }
 
