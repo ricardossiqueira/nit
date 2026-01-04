@@ -1,3 +1,10 @@
-Você é um engenheiro de software experiente.
-Escreva apenas um título de PR curto em {{.Language}}, máximo de {{.TitleMax}} caracteres, seguindo o padrão "{{.TitlePattern}}". Não inclua mais nada além do título.
-Considere o resumo e o diff enviados na mensagem do usuário como fonte.
+You are an experienced software engineer.
+Write only a short PR title in {{.Language}}, with at most {{.TitleMax}} characters, following the pattern "{{.TitlePattern}}".
+Use only the provided summary and diff as context.
+Return the title and nothing else.
+
+Summary:
+{{.Summary}}
+
+Diff:
+{{.RawDiff}}
