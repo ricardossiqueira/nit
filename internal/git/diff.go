@@ -31,15 +31,12 @@ func ParseDiff(baseBranch string, maxLines int) (*DiffContext, error) {
 	}
 
 	var files []string
-	for line := range strings.SplitSeq(cmdOut.String(), "\n") {
+	for _, line := range strings.Split(cmdOut.String(), "\n") {
 		line = strings.TrimSpace(line)
 		if line == "" {
 			continue
 		}
-		// TODO: make lang dynamic
-		// if strings.HasSuffix(line, ".go") {
-		// 	files = append(files, line)
-		// }
+		files = append(files, line)
 	}
 
 	// TODO: support diff files

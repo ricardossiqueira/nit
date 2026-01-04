@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"fmt"
 	"os/exec"
+	"strings"
 )
 
 type Branch struct {
@@ -24,5 +25,5 @@ func GetBranch() (*Branch, error) {
 		return nil, fmt.Errorf("git branch: %s", cmdErr.String())
 	}
 
-	return &Branch{Name: cmdOut.String()}, nil
+	return &Branch{Name: strings.TrimSpace(cmdOut.String())}, nil
 }

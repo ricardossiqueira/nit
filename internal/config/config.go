@@ -6,55 +6,61 @@ package config
 import (
 	"os"
 
-	"go.yaml.in/yaml/v3"
+	"gopkg.in/yaml.v3"
 )
 
 type Config struct {
-	GitHub  GitHubConfig  `mapstruct:"github"`
-	Model   ModelConfig   `mapstruct:"model"`
-	PRStyle PRStyleConfig `mapstruct:"pr_style"`
-	Review  ReviewConfig  `mapstruct:"review"`
-	Prompt  PromptConfig  `mapstruct:"prompt"`
+	GitHub  GitHubConfig  `mapstructure:"github" yaml:"github"`
+	Model   ModelConfig   `mapstructure:"model" yaml:"model"`
+	PRStyle PRStyleConfig `mapstructure:"pr_style" yaml:"pr_style"`
+	Review  ReviewConfig  `mapstructure:"review" yaml:"review"`
+	Prompt  PromptConfig  `mapstructure:"prompt" yaml:"prompt"`
 }
 
 type GitHubConfig struct {
-	DefaultBaseBranch string `mapstruct:"default_base_branch"`
-	UseGHCLI          bool   `mapstruct:"use_gh_cli"`
+	DefaultBaseBranch string `mapstructure:"default_base_branch" yaml:"default_base_branch"`
+	UseGHCLI          bool   `mapstructure:"use_gh_cli" yaml:"use_gh_cli"`
 }
 
 type ModelConfig struct {
-	Provider    string  `mapstruct:"provider"`
-	ModelName   string  `mapstruct:"model_name"`
-	Endpoint    string  `mapstruct:"endpoint"`
-	MaxTokens   int     `mapstruct:"max_tokens"`
-	Temperature float64 `mapstruct:"temperature"`
-	Timeout     int     `mapstruct:"timeout_in_seconds"`
+	Provider       string  `mapstructure:"provider" yaml:"provider"`
+	ModelName      string  `mapstructure:"model_name" yaml:"model_name"`
+	Endpoint       string  `mapstructure:"endpoint" yaml:"endpoint"`
+	MaxTokens      int     `mapstructure:"max_tokens" yaml:"max_tokens"`
+	Temperature    float64 `mapstructure:"temperature" yaml:"temperature"`
+	TimeoutSeconds int     `mapstructure:"timeout_seconds" yaml:"timeout_seconds"`
 }
 
 type PRStyleConfig struct {
-	Language           string    `mapstruct:"language"`
-	TitlePattern       string    `mapstruct:"title_pattern"`
-	AllowedTypes       []string  `mapstruct:"allowed_types"`
-	DescriptionSection []Section `mapstruct:"description_section"`
-	CoverageChecklist  []string  `mapstruct:"coverage_check_list"`
+	Language            string      `mapstructure:"language" yaml:"language"`
+	Title               TitleConfig `mapstructure:"title" yaml:"title"`
+	DescriptionSections []Section   `mapstructure:"description_sections" yaml:"description_sections"`
+	CoverageChecklist   []string    `mapstructure:"coverage_checklist" yaml:"coverage_checklist"`
 }
 
 type ReviewConfig struct {
-	Focus           []string          `mapstruct:"focus"`
-	Language        string            `mapstruct:"language"`
-	StyleGuide      string            `mapstruct:"style_guide"`
-	MaxDiffLines    int               `mapstruct:"max_diff_lines"`
-	SeverityMapping map[string]string `mapstruct:"severity_mapping"`
+	Focus           []string          `mapstructure:"focus" yaml:"focus"`
+	Language        string            `mapstructure:"language" yaml:"language"`
+	PythonVersion   string            `mapstructure:"python_version" yaml:"python_version"`
+	StyleGuide      string            `mapstructure:"style_guide" yaml:"style_guide"`
+	MaxDiffLines    int               `mapstructure:"max_diff_lines" yaml:"max_diff_lines"`
+	SeverityMapping map[string]string `mapstructure:"severity_mapping" yaml:"severity_mapping"`
 }
 
 type PromptConfig struct {
-	SystemInstructions string   `mapstruct:"system_instructions"`
-	ExtraRules         []string `mapstruct:"extra_rules"`
+	SystemInstructions string   `mapstructure:"system_instructions" yaml:"system_instructions"`
+	ExtraRules         []string `mapstructure:"extra_rules" yaml:"extra_rules"`
+}
+
+type TitleConfig struct {
+	Pattern      string   `mapstructure:"pattern" yaml:"pattern"`
+	AllowedTypes []string `mapstructure:"allowed_types" yaml:"allowed_types"`
+	MaxLength    int      `mapstructure:"max_length" yaml:"max_length"`
 }
 
 type Section struct {
-	Name     string `mapstruct:"name"`
-	Required bool   `mapstruct:"required"`
+	Name     string `mapstructure:"name" yaml:"name"`
+	Required bool   `mapstructure:"required" yaml:"required"`
 }
 
 func DefaultConfig() *Config {
@@ -64,20 +70,40 @@ func DefaultConfig() *Config {
 			UseGHCLI:          true,
 		},
 		Model: ModelConfig{
-			Provider:    "ollama",
-			ModelName:   "deepseek-r1:1.5b",
-			Endpoint:    "http://localhost:11434/api/chat",
-			MaxTokens:   2048,
-			Temperature: 0.2,
-			Timeout:     60,
+			Provider:       "ollama",
+			ModelName:      "deepseek-coder-v2",
+			Endpoint:       "http://localhost:11434/v1/chat",
+			MaxTokens:      2048,
+			Temperature:    0.2,
+			TimeoutSeconds: 60,
 		},
 		PRStyle: PRStyleConfig{
-			Language:     "en-US",
-			TitlePattern: "[{type}] {scope}: {summary}",
-			AllowedTypes: []string{"feat", "fix", "chore", "refactor", "docs"},
+			Language: "pt-BR",
+			Title: TitleConfig{
+				Pattern:      "[{type}] {scope}: {summary}",
+				AllowedTypes: []string{"feat", "fix", "chore", "refactor", "docs"},
+				MaxLength:    72,
+			},
+			DescriptionSections: []Section{
+				{Name: "Context", Required: true},
+				{Name: "Changes", Required: true},
+				{Name: "Impact", Required: false},
+				{Name: "Tests", Required: true},
+			},
+			CoverageChecklist: []string{
+				"Explains the reason for the change",
+				"Lists the main changes",
+				"Mentions affected modules",
+				"Indicates impact or risks",
+				"Describes how to test",
+			},
 		},
 		Review: ReviewConfig{
-			Language: "golang",
+			Focus:         []string{"bugs", "legibility", "style"},
+			Language:      "en",
+			PythonVersion: "3.11",
+			StyleGuide:    "pep8",
+			MaxDiffLines:  800,
 		},
 	}
 }

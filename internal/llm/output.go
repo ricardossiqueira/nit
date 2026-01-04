@@ -33,14 +33,17 @@ func ParseDraftOutput(content string) (*DraftOutput, error) {
 		return &draft, nil
 	}
 
+	lastErr := err
+
 	if jsonBlock := extractJSONBlock(content); jsonBlock != "" {
 		draft, err := UnmarshalDraftOutput([]byte(jsonBlock))
 		if err == nil {
 			return &draft, nil
 		}
+		lastErr = err
 	}
 
-	return nil, fmt.Errorf("error parsing llm output: %w\ncontent: %s", err, content)
+	return nil, fmt.Errorf("error parsing llm output: %w\ncontent: %s", lastErr, content)
 }
 
 func extractJSONBlock(markdownText string) string {

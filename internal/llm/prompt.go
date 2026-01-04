@@ -10,63 +10,80 @@ import (
 	"nit/internal/git"
 )
 
-func BuildDraftPrompt(cfg *config.Config, diff *git.DiffContext, langOverride string) (string, error) {
+type DraftPrompt struct {
+	System string
+	User   string
+}
+
+func BuildDraftPrompt(cfg *config.Config, diff *git.DiffContext, langOverride string) (*DraftPrompt, error) {
 	lang := cfg.PRStyle.Language
 	if langOverride != "" {
 		lang = langOverride
 	}
 
-	var buf bytes.Buffer
+	titlePattern := cfg.PRStyle.Title.Pattern
+	if titlePattern == "" {
+		titlePattern = "[{type}] {scope}: {summary}"
+	}
 
-	fmt.Fprintf(&buf, `You are a senior software engineer proficient in %s.
+	titleMax := cfg.PRStyle.Title.MaxLength
+	if titleMax == 0 {
+		titleMax = 72
+	}
+
+	authoringLang := cfg.Review.Language
+	if authoringLang == "" {
+		authoringLang = lang
+	}
+
+	var systemPrompt bytes.Buffer
+	var userPrompt bytes.Buffer
+
+	fmt.Fprintf(&systemPrompt, `You are a senior software engineer proficient in %s.
 
 ANALYZE the git diff below and RETURN ONLY VALID JSON in this EXACT format:
 
 {
-  "pr_title": "[concise PR title in %s, max 72 chars]",
+  "pr_title": "[concise PR title in %s, max %d chars]",
   "pr_description": "[detailed description in %s following the Markdown template below]", 
   "commit_message": "[conventional commit message in %s: type: short message]"
 }
 
 IMPORTANT: 
 - Output ONLY JSON, no explanations or extra text
-- pr_title: maximum 72 characters
+- pr_title: maximum %d characters
 - pr_description: use the EXACT Markdown template below
 - commit_message: conventional commits format (feat:, fix:, etc.)
 
 Use this EXACT Markdown template for pr_description:
 
-`, cfg.Review.Language, lang, lang, lang)
+`, authoringLang, lang, titleMax, lang, lang, titleMax)
 
-	fmt.Fprintf(&buf, `# %s
+	fmt.Fprintf(&systemPrompt, "# %s\n\n", titlePattern)
 
-## Context
-- ...
-
-## Changes
-- ...
-
-## Impact
-- ...
-
-## Tests
-- ...
-
-## Coverage checklist
-`, cfg.PRStyle.TitlePattern)
-
-	for _, item := range cfg.PRStyle.CoverageChecklist {
-		fmt.Fprintf(&buf, `- [ ] %s\n`, item)
+	if len(cfg.PRStyle.DescriptionSections) == 0 {
+		fmt.Fprintf(&systemPrompt, "## Context\n- ...\n\n## Changes\n- ...\n\n## Impact\n- ...\n\n## Tests\n- ...\n\n")
+	} else {
+		for _, section := range cfg.PRStyle.DescriptionSections {
+			fmt.Fprintf(&systemPrompt, "## %s\n- ...\n\n", section.Name)
+		}
 	}
 
-	fmt.Fprintf(&buf, `
+	fmt.Fprintf(&systemPrompt, "## Coverage checklist\n")
 
-**Changes summary:**
-%s
+	for _, item := range cfg.PRStyle.CoverageChecklist {
+		fmt.Fprintf(&systemPrompt, `- [ ] %s\n`, item)
+	}
 
-**Full diff:**
-diff
-%s`, diff.Summary, diff.RawDiff)
+	fmt.Fprintf(
+		&userPrompt,
+		"**Changes summary:**\n%s\n\n**Full diff:**\ndiff\n%s",
+		diff.Summary,
+		diff.RawDiff,
+	)
 
-	return buf.String(), nil
+	return &DraftPrompt{
+		System: systemPrompt.String(),
+		User:   userPrompt.String(),
+	}, nil
 }

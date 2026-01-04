@@ -43,18 +43,17 @@ type Message struct {
 	Thinking string `json:"thinking"`
 }
 
-func Generate(ctx context.Context, store RunStore, modelCfg config.ModelConfig, prompt string, currentBranch string) (*Run, error) {
-	systemMessage := "You are an assistant specialized in code reviews."
+func Generate(ctx context.Context, store RunStore, modelCfg config.ModelConfig, prompt *DraftPrompt, currentBranch string) (*Run, error) {
 	body := map[string]any{
 		"model": modelCfg.ModelName,
 		"messages": []map[string]string{
 			{
 				"role":    "system",
-				"content": systemMessage,
+				"content": prompt.System,
 			},
 			{
 				"role":    "user",
-				"content": prompt,
+				"content": prompt.User,
 			},
 		},
 		"max_tokens":  modelCfg.MaxTokens,
@@ -67,7 +66,7 @@ func Generate(ctx context.Context, store RunStore, modelCfg config.ModelConfig, 
 		return nil, err
 	}
 
-	client := &http.Client{Timeout: time.Duration(modelCfg.Timeout) * time.Second}
+	client := &http.Client{Timeout: time.Duration(modelCfg.TimeoutSeconds) * time.Second}
 	req, err := http.NewRequest("POST", modelCfg.Endpoint, bytes.NewReader(data))
 	if err != nil {
 		return nil, err
@@ -107,8 +106,8 @@ func Generate(ctx context.Context, store RunStore, modelCfg config.ModelConfig, 
 	run := &Run{
 		Model:         modelCfg.ModelName,
 		Endpoint:      modelCfg.Endpoint,
-		System:        systemMessage,
-		Prompt:        prompt,
+		System:        prompt.System,
+		Prompt:        prompt.User,
 		Response:      *llmResponseJSON,
 		DurationMS:    llmResponse.TotalDuration,
 		CreatedAt:     time.Now(),
@@ -116,7 +115,9 @@ func Generate(ctx context.Context, store RunStore, modelCfg config.ModelConfig, 
 	}
 
 	if store != nil {
-		_ = store.SaveRun(ctx, run)
+		if err := store.SaveRun(ctx, run); err != nil {
+			return nil, fmt.Errorf("failed to save run: %w", err)
+		}
 	}
 
 	return run, nil

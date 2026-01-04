@@ -14,6 +14,10 @@ import (
 )
 
 func Generate(cfg *config.Config, store *db.Store, runID string, useLast bool, outputFormat string, lang string, baseBranch string) error {
+	if store == nil {
+		return fmt.Errorf("store not initialized")
+	}
+
 	if runID != "" {
 		draft, err := store.GetDraftByID(context.TODO(), runID)
 		if err != nil {
@@ -58,12 +62,8 @@ func Generate(cfg *config.Config, store *db.Store, runID string, useLast bool, o
 		return fmt.Errorf("llm generation failed: %w", err)
 	}
 
-	if err := store.SaveRun(context.TODO(), resp); err != nil {
-		return fmt.Errorf("failed saving response to the db: %w", err)
-	}
-
 	if err := output.PrintDraft(&resp.Response, output.OutputFormat(outputFormat)); err != nil {
-		return fmt.Errorf("faile do print draft: %w", err)
+		return fmt.Errorf("failed to print draft: %w", err)
 	}
 
 	return nil
